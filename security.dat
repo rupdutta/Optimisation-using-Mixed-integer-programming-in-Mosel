@@ -1,0 +1,4 @@
+! Data file for `project_final.mos'
+
+payment: [6 10 10 9 5 7 5 10 3 7 6 9 9 4 7 8]          ! Security-guard costs
+

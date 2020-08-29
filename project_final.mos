@@ -1,0 +1,129 @@
+(!******************************************************
+   Group Assignment
+  * Problem No. 1                              		    *
+  * ======================                              *                       *
+  * file project_final.mos                              *
+  * Mosel language used for formulating					*
+  * Demonstrating Mosel Language - the sum construct	*
+  *  author: Group 17			                    	*
+  *******************************************************!)
+
+model security_guard
+ uses "mmxprs"                    ! We shall use Xpress-Optimizer
+
+ declarations
+ 	Number = 1..16           ! constant range 
+    row1 = 1..4              ! constant range
+	row2 = 5..8              ! constant range
+	row3 = 9..12             ! constant range
+	row4 = 13..16            ! constant range
+	col1 = {1,5,9,13}        ! constant set
+	col2 = {2,6,10,14}       ! constant set
+	col3 = {3,7,11,15}       ! constant set
+	col4 = {4,8,12,16}       ! constant set
+    x: array(Number) of mpvar    ! Decision variables: # Security Guards
+   payment: array(Number) of real
+   R1,R11,R2,R21,R3,R31,R4,R41,C1,C2,C3,C4: real   !Variables declared for 10% increased part calculation 
+ end-declarations
+ 
+ initializations from 'security.dat' 
+	payment	
+ end-initializations
+
+ 
+ Z:=sum(i in Number) payment(i)*x(i)    ! Objective function
+
+!Use sum construct to create constraints
+
+ sum(i in col4)  x(i) >= 2
+ sum(i in col3)  x(i) >= 2
+ sum(i in col2)  x(i) >= 2
+ sum(i in col1)  x(i) >= 2 
+  
+ sum(i in row4)  x(i) >= 2
+ sum(i in row3)  x(i) >= 2
+ sum(i in row2)  x(i) >= 2
+ sum(i in row1)  x(i) >= 2 
+
+ 
+ exportprob(EP_MIN,"",Z)
+ 
+
+ !procedure to check problem status
+procedure print_status
+	declarations
+		status: string
+	end-declarations
+	case getprobstat of
+		XPRS_OPT: status:="Optimum found"
+		XPRS_UNF: status:="Unfinished"
+		XPRS_INF: status:="Infeasible"
+		XPRS_UNB: status:="Unbounded"
+		XPRS_OTH: status:="Failed"
+		else status:="???"
+	end-case
+	writeln("Problem status: ", status)
+end-procedure
+ 
+procedure solve
+ 	 minimize(Z)                    ! Solve the problem
+	 print_status
+
+
+ writeln("\nInteger Programming Solution:")          
+ writeln("\nObjective Function value is : ", getobjval)  ! Obj Func. printing
+
+ forall(i in Number)
+     writeln(" Place ",getsol(x(i)), " number of security guard at grid-cell ", i ) ! Optimal Solution printing
+	 
+end-procedure
+
+solve                             ! calling solve procedure
+
+
+ writeln ("\n2nd part of the solution")        ! 2nd part of the solution -- 
+! Validating even number of guards are placed per row and per column condition
+    
+    ! all columns calculation
+    C1:=sum(i in col1) getsol(x(i))
+    C2:=sum(i in col2) getsol(x(i))
+    C3:=sum(i in col3) getsol(x(i))
+    C4:=sum(i in col4) getsol(x(i))
+    
+	!row 1 calculation
+ 	 R1:=sum(i in row1) getsol(x(i))
+	 if R1 mod 2 = 0 and (C1 mod 2 = 0 or C2 mod 2 = 0 or C3 mod 2 = 0 or C4 mod 2 = 0) then
+	 	R11:= (sum(i in row1) payment(i) * getsol(x(i))) * .1	      
+	 
+	 end-if
+	 writeln ("\nThe incremental cost of Row-1 is: ", R11)
+	 
+	 !row 2 calculation
+	 R2:=sum(i in row2) getsol(x(i))
+	 if R2 mod 2 = 0 and (C1 mod 2 = 0 or C2 mod 2 = 0 or C3 mod 2 = 0 or C4 mod 2 = 0) then
+	 	R21:= (sum(i in row2) payment(i) * getsol(x(i))) * .1	
+	 
+	 end-if
+	 writeln ("The incremental cost of Row-2 is: ", R21)
+	 
+	 !row 3 calculation
+	 R3:=sum(i in row3) getsol(x(i))
+	 if R3 mod 2 = 0 and (C1 mod 2 = 0 or C2 mod 2 = 0 or C3 mod 2 = 0 or C4 mod 2 = 0) then
+	 	R31:= (sum(i in row3) payment(i) * getsol(x(i))) * .1	
+	 
+	 end-if
+	 writeln ("The incremental cost of Row-3 is: ", R31)
+	 
+	 !row 4 calculation
+	 R4:=sum(i in row4) getsol(x(i))
+	 if R4 mod 2 = 0 and (C1 mod 2 = 0 or C2 mod 2 = 0 or C3 mod 2 = 0 or C4 mod 2 = 0) then
+	 	R41:= (sum(i in row4) payment(i) * getsol(x(i))) * .1	
+	 
+	 end-if
+	 writeln ("The incremental cost of Row-4 is: ", R41)
+
+     writeln("\n10 percent Increment Value is: ", R11 + R21 + R31 + R41)
+	 writeln("The final objective function minimized value by adding increment is: ", getobjval + R11 + R21 + R31 + R41)  
+	 writeln("*************************************************************************")
+	 
+end-model
