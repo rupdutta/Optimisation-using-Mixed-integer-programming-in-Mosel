@@ -1,19 +1,11 @@
-(!******************************************************
-   Group Assignment
-  * Problem No. 1                              		    *
-  * ======================                              *                       *
-  * file project_final.mos                              *
-  * Mosel language used for formulating					*
-  * Demonstrating Mosel Language - the sum construct	*
-  *  author: Group 17			                    	*
-  *******************************************************!)
+
 
 model security_guard
- uses "mmxprs"                    ! We shall use Xpress-Optimizer
+ uses "mmxprs"                    ! Please use Xpress-Optimizer
 
  declarations
  	Number = 1..16           ! constant range 
-    row1 = 1..4              ! constant range
+    row1 = 1..4                  ! constant range
 	row2 = 5..8              ! constant range
 	row3 = 9..12             ! constant range
 	row4 = 13..16            ! constant range
